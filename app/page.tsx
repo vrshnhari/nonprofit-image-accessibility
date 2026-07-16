@@ -82,6 +82,7 @@ export default function Home() {
         throw new Error(data.error ?? "The image could not be described.");
       }
 
+      console.log("Image description response:", data);
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");

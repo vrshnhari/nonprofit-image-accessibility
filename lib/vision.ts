@@ -15,11 +15,13 @@ const ACCESSIBILITY_PROMPT = `You are an accessibility assistant. Analyze the up
 
 Return only valid JSON. Do not include any markdown formatting or code fences.`;
 
+const DEFAULT_GROQ_VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+
 export async function describeImage(
   imageBase64: string,
   mimeType: SupportedMimeType,
 ): Promise<VisionResult> {
-  const provider = process.env.VISION_PROVIDER ?? "claude";
+  const provider = process.env.VISION_PROVIDER ?? "groq";
 
   if (provider === "groq") {
     return describeWithGroq(imageBase64, mimeType);
@@ -83,6 +85,8 @@ async function describeWithGroq(
     throw new Error("Missing GROQ_API_KEY in .env.local or Vercel environment variables.");
   }
 
+  const model = process.env.GROQ_VISION_MODEL ?? DEFAULT_GROQ_VISION_MODEL;
+
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -90,7 +94,7 @@ async function describeWithGroq(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "meta-llama/llama-4-scout-17b-16e-instruct",
+      model,
       temperature: 0.2,
       response_format: { type: "json_object" },
       messages: [
@@ -132,7 +136,12 @@ async function describeWithGroq(
 }
 
 function parseVisionJson(text: string): VisionResult {
-  const parsed = JSON.parse(text) as Partial<VisionResult>;
+  const cleanedText = text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```$/i, "")
+    .trim();
+  const parsed = JSON.parse(cleanedText) as Partial<VisionResult>;
 
   if (
     typeof parsed.alt_text !== "string" ||

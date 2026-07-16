@@ -12,8 +12,8 @@ Upload one image and the app returns:
 
 - Next.js 14 App Router
 - TypeScript
-- Anthropic Claude Vision by default
-- Optional Groq vision provider
+- Groq vision provider by default
+- Optional Anthropic Claude Vision provider
 - Vercel deployment
 - No database and no authentication
 
@@ -31,11 +31,11 @@ Create `.env.local`:
 cp .env.example .env.local
 ```
 
-Add your Claude API key:
+Add your Groq API key:
 
 ```bash
-ANTHROPIC_API_KEY=your_key_here
-VISION_PROVIDER=claude
+GROQ_API_KEY=your_key_here
+VISION_PROVIDER=groq
 ```
 
 Start the dev server:
@@ -54,19 +54,19 @@ Official guidance: https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.
 
 ## Vision Providers
 
-The provider is selected with one environment variable:
-
-```bash
-VISION_PROVIDER=claude
-```
-
-or:
+The provider is selected with one environment variable. Groq is the recommended default:
 
 ```bash
 VISION_PROVIDER=groq
 ```
 
-Claude uses `ANTHROPIC_API_KEY`. Groq uses `GROQ_API_KEY`. See [docs/GROQ_SETUP.md](docs/GROQ_SETUP.md) for Groq setup steps.
+Claude is still available as an alternative:
+
+```bash
+VISION_PROVIDER=claude
+```
+
+Groq uses `GROQ_API_KEY`. Claude uses `ANTHROPIC_API_KEY`. See [docs/GROQ_SETUP.md](docs/GROQ_SETUP.md) for Groq setup steps.
 
 ## Deploy To Vercel
 
@@ -75,8 +75,8 @@ Claude uses `ANTHROPIC_API_KEY`. Groq uses `GROQ_API_KEY`. See [docs/GROQ_SETUP.
 3. Import the GitHub repo.
 4. Add environment variables in Vercel project settings:
    - `VISION_PROVIDER`
-   - `ANTHROPIC_API_KEY`
-   - optional `GROQ_API_KEY`
+   - `GROQ_API_KEY`
+   - optional `ANTHROPIC_API_KEY`
 5. Deploy.
 
 Every push to `main` will trigger a new deployment.
