@@ -15,8 +15,35 @@ const emptyResult: ImageDescription = {
   text_in_image: "",
 };
 
+const MAX_UPLOAD_SIZE_BYTES = 4 * 1024 * 1024;
+const SUPPORTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
 function stripDataUrlPrefix(dataUrl: string) {
   return dataUrl.replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, "");
+}
+
+async function hasValidImageSignature(file: File) {
+  const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+
+  if (file.type === "image/jpeg") {
+    return header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff;
+  }
+
+  if (file.type === "image/png") {
+    return header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4e && header[3] === 0x47;
+  }
+
+  if (file.type === "image/gif") {
+    return header[0] === 0x47 && header[1] === 0x49 && header[2] === 0x46;
+  }
+
+  if (file.type === "image/webp") {
+    const riff = String.fromCharCode(...header.slice(0, 4));
+    const webp = String.fromCharCode(...header.slice(8, 12));
+    return riff === "RIFF" && webp === "WEBP";
+  }
+
+  return false;
 }
 
 export default function Home() {
@@ -38,8 +65,27 @@ export default function Home() {
       return;
     }
 
-    if (!file.type.startsWith("image/")) {
-      setError("Please upload a JPEG, PNG, or WebP image.");
+    if (!SUPPORTED_IMAGE_TYPES.includes(file.type)) {
+      setError("Please upload a JPEG, PNG, GIF, or WebP image.");
+      setResult(emptyResult);
+      setPreviewUrl("");
+      setImageBase64("");
+      return;
+    }
+
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      setError("That image is too large. Please upload an image under 4MB.");
+      setResult(emptyResult);
+      setPreviewUrl("");
+      setImageBase64("");
+      return;
+    }
+
+    if (!(await hasValidImageSignature(file))) {
+      setError("This file does not look like a real image. Please upload a valid JPEG, PNG, GIF, or WebP.");
+      setResult(emptyResult);
+      setPreviewUrl("");
+      setImageBase64("");
       return;
     }
 
@@ -79,13 +125,13 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "The image could not be described.");
+        throw new Error(data.error ?? "The image could not be analyzed. Please try again.");
       }
 
       console.log("Image description response:", data);
       setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : "The image could not be analyzed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -100,7 +146,7 @@ export default function Home() {
 
     await navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    window.setTimeout(() => setCopiedKey(null), 1400);
+    window.setTimeout(() => setCopiedKey(null), 2000);
   }
 
   return (
@@ -122,7 +168,8 @@ export default function Home() {
           <div className="upload-panel">
             <label className="upload-zone">
               <input
-                accept="image/png,image/jpeg,image/webp"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                disabled={loading}
                 type="file"
                 onChange={handleFileChange}
               />
@@ -150,10 +197,20 @@ export default function Home() {
               onClick={generateDescription}
             >
               {loading ? <Loader2 size={18} aria-hidden="true" /> : <Sparkles size={18} aria-hidden="true" />}
-              {loading ? "Generating..." : "Generate accessible text"}
+              {loading ? "Analyzing image..." : "Generate accessible text"}
             </button>
 
             {error ? <p className="error">{error}</p> : null}
+            {error && imageBase64 ? (
+              <button
+                className="secondary-button"
+                disabled={loading}
+                type="button"
+                onClick={generateDescription}
+              >
+                Try again
+              </button>
+            ) : null}
           </div>
 
           <div className="results-panel">
@@ -213,15 +270,20 @@ function OutputBox({
     <div className="output-group">
       <div className="label-row">
         <label className="output-label">{label}</label>
-        <button
-          aria-label={`Copy ${label}`}
-          className="copy-button"
-          title={`Copy ${label}`}
-          type="button"
-          onClick={onCopy}
-        >
-          {copied ? <Check size={17} /> : <Clipboard size={17} />}
-        </button>
+        <span className="copy-action">
+          <button
+            aria-label={`Copy ${label}`}
+            className="copy-button"
+            title={`Copy ${label}`}
+            type="button"
+            onClick={onCopy}
+          >
+            {copied ? <Check size={17} /> : <Clipboard size={17} />}
+          </button>
+          <span className="copied-message" aria-live="polite">
+            {copied ? "Copied!" : ""}
+          </span>
+        </span>
       </div>
       <textarea className={long ? "long-text" : ""} readOnly value={value} />
     </div>

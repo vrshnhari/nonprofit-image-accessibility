@@ -198,6 +198,29 @@ h1 {
   opacity: 0.55;
 }
 
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--accent-strong);
+  font-weight: 800;
+}
+
+.secondary-button:hover {
+  background: var(--accent-soft);
+}
+
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .results-header {
   display: flex;
   align-items: center;
@@ -247,6 +270,21 @@ h1 {
 
 .copy-button:hover {
   background: var(--accent-soft);
+}
+
+.copy-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 108px;
+}
+
+.copied-message {
+  min-width: 58px;
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+  font-weight: 800;
 }
 
 textarea {
