@@ -30,7 +30,7 @@ export class GroqNetworkError extends Error {
   }
 }
 
-const ACCESSIBILITY_PROMPT = `You are an accessibility assistant. Analyze the uploaded image and return a JSON object with three keys: 'alt_text' (under 125 characters, WCAG-compliant), 'long_description' (detailed), and 'text_in_image' (transcribe visible text or return 'None detected'). Return only valid JSON.`;
+const ACCESSIBILITY_PROMPT = `You are an accessibility assistant. Analyze the uploaded image and return only valid JSON with three keys: 'alt_text', 'long_description', and 'text_in_image'. Keep alt_text under 125 characters and make it convey the image's purpose, not just generic objects. For flyers, signs, and screenshots, include the most important visible text such as event title, date, time, location, labels, or chart trend. For unclear, dark, or ambiguous photos, say what is uncertain instead of inventing details. Return 'None detected' for text_in_image only when no readable text is visible.`;
 
 const DEFAULT_GROQ_VISION_MODEL = "qwen/qwen3.6-27b";
 
@@ -70,6 +70,8 @@ export async function describeImage(
         model,
         temperature: 0.2,
         response_format: { type: "json_object" },
+        reasoning_format: "hidden",
+        reasoning_effort: "none",
         messages: [
           {
             role: "system",
@@ -163,5 +165,10 @@ function parseVisionJson(text: string): VisionResult {
     .replace(/```$/i, "")
     .trim();
 
-  return JSON.parse(cleanedText) as VisionResult;
+  const jsonStart = cleanedText.indexOf("{");
+  const jsonEnd = cleanedText.lastIndexOf("}");
+  const jsonText =
+    jsonStart >= 0 && jsonEnd > jsonStart ? cleanedText.slice(jsonStart, jsonEnd + 1) : cleanedText;
+
+  return JSON.parse(jsonText) as VisionResult;
 }
