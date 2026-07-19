@@ -32,7 +32,7 @@ export class GroqNetworkError extends Error {
 
 const ACCESSIBILITY_PROMPT = `You are an accessibility assistant. Analyze the uploaded image and return a JSON object with three keys: 'alt_text' (under 125 characters, WCAG-compliant), 'long_description' (detailed), and 'text_in_image' (transcribe visible text or return 'None detected'). Return only valid JSON.`;
 
-const DEFAULT_GROQ_VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct";
+const DEFAULT_GROQ_VISION_MODEL = "qwen/qwen3.6-27b";
 
 const MOCK_RESULT: Required<VisionResult> = {
   alt_text:
