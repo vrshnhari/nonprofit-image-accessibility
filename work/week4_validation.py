@@ -276,7 +276,7 @@ def call_groq(image_path: Path, prompt: str, api_key: str, model: str) -> dict:
     body = {
         "model": model,
         "temperature": 0.2,
-        "max_completion_tokens": 180,
+        "max_completion_tokens": 360,
         "response_format": {"type": "json_object"},
         "reasoning_format": "hidden",
         "reasoning_effort": "none",
