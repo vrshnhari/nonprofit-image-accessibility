@@ -1,23 +1,42 @@
 # Accessible Alt Text Generator
 
-A 4-week Flintolabs AI Residency project that helps small nonprofits, campus clubs, and volunteer groups make social media images accessible to blind and low-vision followers.
+Accessible Alt Text Generator helps small nonprofits, campus clubs, and volunteer groups turn images into copy-ready accessibility text.
 
-Upload one image and the app returns:
+![Accessible Alt Text Generator upload screen with a dashed upload zone and empty results panel.](outputs/readme-screenshots/app-upload-state.png)
 
-- **Short Alt Text**: WCAG-friendly alt text under 125 characters.
-- **Long Description**: A detailed description for captions or extended descriptions.
-- **Text in Image**: A transcription of visible flyer, sign, or poster text.
+![Accessible Alt Text Generator showing generated short alt text, long description, and visible text fields.](outputs/readme-screenshots/app-results-state.png)
 
-## Tech Stack
+## What This Tool Does
 
-- Next.js 14 App Router
-- TypeScript
-- Groq vision provider by default
-- Optional Anthropic Claude Vision provider
-- Vercel deployment
-- No database and no authentication
+This is a stateless Next.js app for generating accessible descriptions from one uploaded image at a time. A user uploads a campus event photo, flyer, screenshot, or object photo, then the app returns three outputs:
 
-## Run Locally
+- **Short Alt Text**: concise text for an `alt=""` attribute.
+- **Long Description**: a fuller description for a caption or extended description.
+- **Text in Image**: visible text transcribed from flyers, posters, signs, screenshots, or graphics.
+
+The app does not store images, generated text, accounts, or history. Each upload is processed as one independent request.
+
+## WCAG 1.1.1 Guidance
+
+[WCAG 1.1.1 Non-text Content](https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html) says that meaningful non-text content should have a text alternative that serves the same purpose. In my own words, "equivalent purpose" means that if someone cannot see the image, the text should give them the same important information or function they would have gotten from seeing it.
+
+For example, a flyer is not just "a blue poster." Its purpose is usually the event title, date, time, location, and call to action. A chart is not just "a bar chart." Its purpose is the trend or comparison the viewer is supposed to understand.
+
+This app enforces a 125-character limit for the short alt text because that is a common screen reader and publishing convention, not a WCAG requirement. WCAG 1.1.1 itself does not set a character limit.
+
+## Before-and-After Examples
+
+These examples use the validation images in `outputs/validation-images`. The "Before" column is intentionally empty or filename-like because that is the accessibility problem this project is meant to solve.
+
+| Image | Before | Generated Alt Text |
+| --- | --- | --- |
+| Campus club fair graphic | `alt=""` | UW Club Fair graphic showing students visiting club tables on a campus lawn. |
+| Campus food drive flyer | `IMG_4471.jpg` | Flyer for Campus Food Drive with donation details and event information. |
+| Club signups chart screenshot | No alt text | Bar chart showing club signups increasing from January to April. |
+
+Validation details are in [outputs/week4_validation_results.xlsx](outputs/week4_validation_results.xlsx), and prompt iteration notes are in [PROMPT_LOG.md](PROMPT_LOG.md).
+
+## Local Development
 
 Install dependencies:
 
@@ -25,79 +44,51 @@ Install dependencies:
 npm install
 ```
 
-Create `.env.local`:
+Create a local environment file:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Add your Groq API key:
+Get a Groq API key:
+
+1. Go to [console.groq.com](https://console.groq.com).
+2. Sign up or log in.
+3. Open **API Keys**.
+4. Generate a new key.
+5. Add it to `.env.local`:
 
 ```bash
 GROQ_API_KEY=your_key_here
-VISION_PROVIDER=groq
 ```
 
-Start the dev server:
+Run the app:
 
 ```bash
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open:
 
-## WCAG 1.1.1 Guidance
+```text
+http://localhost:3000
+```
 
-WCAG 1.1.1 says non-text content should have a text alternative that serves the same purpose. For this tool, that means the short alt text should be concise, meaningful, avoid redundant phrases like "image of," and preserve essential embedded text when the image is a flyer or poster.
+## Configuration
 
-Official guidance: https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html
-
-## Vision Providers
-
-The provider is selected with one environment variable. Groq is the recommended default:
+Set these variables locally in `.env.local` and in Vercel project settings. Do not commit real API keys to GitHub.
 
 ```bash
 VISION_PROVIDER=groq
+GROQ_API_KEY=your_key_here
+GROQ_VISION_MODEL=qwen/qwen3.6-27b
+USE_MOCK=false
 ```
 
-Claude is still available as an alternative:
+`GROQ_API_KEY` is the private server-side key used by the API route. It is only read in server code and should never be prefixed with `NEXT_PUBLIC_`.
 
-```bash
-VISION_PROVIDER=claude
-```
+`GROQ_VISION_MODEL` controls the Groq vision model. This project uses `qwen/qwen3.6-27b`, verified on Groq's supported model list on July 23, 2026. If image generation stops working with a model error, check [Groq's supported models page](https://console.groq.com/docs/models) and update this variable to a current model with image/OCR capability.
 
-Groq uses `GROQ_API_KEY`. Claude uses `ANTHROPIC_API_KEY`. See [docs/GROQ_SETUP.md](docs/GROQ_SETUP.md) for Groq setup steps.
+`USE_MOCK=true` runs the app with fixture data and does not call Groq. This is useful for testing the UI, copy buttons, loading states, and 125-character truncation without using API quota or needing a key.
 
-## Deploy To Vercel
-
-1. Push this repo to GitHub.
-2. Go to https://vercel.com/new.
-3. Import the GitHub repo.
-4. Add environment variables in Vercel project settings:
-   - `VISION_PROVIDER`
-   - `GROQ_API_KEY`
-   - optional `ANTHROPIC_API_KEY`
-5. Deploy.
-
-Every push to `main` will trigger a new deployment.
-
-## Validation Notes
-
-Before final submission, test at least 10 images:
-
-- 3 group event photos
-- 3 flyers or posters with visible text
-- 2 nature scenes
-- 2 close-up object photos
-
-Track the generated short alt text, character count, and whether it is concise, meaningful, under 125 characters, and preserves embedded text.
-
-## Before-And-After Examples
-
-Add three real examples after testing with campus or nonprofit images.
-
-| Image Type | Before | Generated Alt Text |
-| --- | --- | --- |
-| Beach cleanup photo | No alt text | Five volunteers in bright vests hold trash bags on a sandy beach. |
-| Event flyer | No alt text | Event flyer for Beach Cleanup Day on Saturday, March 15 at 9 AM. |
-| Club meeting photo | No alt text | Students sit around a table sorting donation supplies for a campus drive. |
+For deployment, add the environment variables in the Vercel dashboard under **Settings → Environment Variables**, then redeploy. `.env.local` is listed in `.gitignore`, so local secrets stay off GitHub.

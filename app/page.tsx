@@ -47,6 +47,8 @@ async function hasValidImageSignature(file: File) {
 }
 
 export default function Home() {
+  const fileInputId = "image-upload";
+  const uploadHintId = "upload-hint";
   const [previewUrl, setPreviewUrl] = useState("");
   const [imageBase64, setImageBase64] = useState("");
   const [mimeType, setMimeType] = useState("");
@@ -155,10 +157,10 @@ export default function Home() {
         <header className="topbar">
           <div>
             <p className="eyebrow">Flintolabs AI Residency</p>
-            <h1>Accessible alt text for nonprofit images</h1>
+            <h1>Accessible Alt Text Generator</h1>
             <p className="subtitle">
-              Upload one event photo, flyer, or campaign image and generate a short
-              alt text, long description, and embedded-text transcription.
+              Turn nonprofit and campus images into copy-ready alt text, long
+              descriptions, and visible-text transcriptions.
             </p>
           </div>
           <div className="status-pill">Stateless MVP</div>
@@ -169,7 +171,9 @@ export default function Home() {
             <label className="upload-zone">
               <input
                 accept="image/png,image/jpeg,image/gif,image/webp"
+                aria-describedby={uploadHintId}
                 disabled={loading}
+                id={fileInputId}
                 type="file"
                 onChange={handleFileChange}
               />
@@ -178,8 +182,8 @@ export default function Home() {
                   <ImagePlus size={26} />
                 </span>
                 <span className="upload-title">Upload an image</span>
-                <span className="upload-hint">
-                  Choose a JPEG, PNG, or WebP file to generate accessible copy.
+                <span className="upload-hint" id={uploadHintId}>
+                  Choose a JPEG, PNG, GIF, or WebP file under 4MB.
                 </span>
               </span>
             </label>
@@ -197,10 +201,16 @@ export default function Home() {
               onClick={generateDescription}
             >
               {loading ? <Loader2 size={18} aria-hidden="true" /> : <Sparkles size={18} aria-hidden="true" />}
-              {loading ? "Analyzing image..." : "Generate accessible text"}
+              <span aria-live="polite">
+                {loading ? "Analyzing image..." : "Generate accessible text"}
+              </span>
             </button>
 
-            {error ? <p className="error">{error}</p> : null}
+            {error ? (
+              <p aria-live="polite" className="error" role="alert">
+                {error}
+              </p>
+            ) : null}
             {error && imageBase64 ? (
               <button
                 className="secondary-button"
@@ -222,12 +232,14 @@ export default function Home() {
             {result.alt_text || result.long_description || result.text_in_image ? (
               <>
                 <OutputBox
+                  id="short-alt-text"
                   label="Short Alt Text"
                   value={result.alt_text}
                   copied={copiedKey === "alt_text"}
                   onCopy={() => copyText("alt_text")}
                 />
                 <OutputBox
+                  id="long-description"
                   label="Long Description"
                   value={result.long_description}
                   copied={copiedKey === "long_description"}
@@ -235,6 +247,7 @@ export default function Home() {
                   onCopy={() => copyText("long_description")}
                 />
                 <OutputBox
+                  id="text-in-image"
                   label="Text in Image"
                   value={result.text_in_image}
                   copied={copiedKey === "text_in_image"}
@@ -254,12 +267,14 @@ export default function Home() {
 }
 
 function OutputBox({
+  id,
   label,
   value,
   copied,
   long = false,
   onCopy,
 }: {
+  id: string;
   label: string;
   value: string;
   copied: boolean;
@@ -269,10 +284,12 @@ function OutputBox({
   return (
     <div className="output-group">
       <div className="label-row">
-        <label className="output-label">{label}</label>
+        <label className="output-label" htmlFor={id}>
+          {label}
+        </label>
         <span className="copy-action">
           <button
-            aria-label={`Copy ${label}`}
+            aria-label={`Copy ${label.toLowerCase()}`}
             className="copy-button"
             title={`Copy ${label}`}
             type="button"
@@ -285,7 +302,7 @@ function OutputBox({
           </span>
         </span>
       </div>
-      <textarea className={long ? "long-text" : ""} readOnly value={value} />
+      <textarea className={long ? "long-text" : ""} id={id} readOnly value={value} />
     </div>
   );
 }

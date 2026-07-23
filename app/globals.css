@@ -1,7 +1,7 @@
 :root {
   --background: #f7f5ef;
   --foreground: #1b1d1f;
-  --muted: #60666d;
+  --muted: #4f5761;
   --line: #d7d2c8;
   --panel: #ffffff;
   --accent: #0f766e;
@@ -32,6 +32,11 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
 }
 
 .shell {
@@ -118,7 +123,8 @@ h1 {
 }
 
 .upload-zone:hover,
-.upload-zone:focus-within {
+.upload-zone:focus-within,
+.upload-zone:has(input:focus-visible) {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
@@ -242,7 +248,14 @@ h1 {
 .output-group {
   display: grid;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.output-group:first-of-type {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .label-row {
