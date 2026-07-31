@@ -2,6 +2,12 @@
 
 Accessible Alt Text Generator helps small nonprofits, campus clubs, and volunteer groups turn images into copy-ready accessibility text.
 
+## Demo
+
+Demo video: add the Google Drive link here after the final recording.
+
+Validation details are in [outputs/week4_validation_results.xlsx](outputs/week4_validation_results.xlsx), and prompt iteration notes are in [PROMPT_LOG.md](PROMPT_LOG.md).
+
 ![Accessible Alt Text Generator upload screen with a dashed upload zone and empty results panel.](outputs/readme-screenshots/app-upload-state.png)
 
 ![Accessible Alt Text Generator showing generated short alt text, long description, and visible text fields.](outputs/readme-screenshots/app-results-state.png)
@@ -35,6 +41,24 @@ These examples use the validation images in `outputs/validation-images`. The "Be
 | Club signups chart screenshot | No alt text | Bar chart showing club signups increasing from January to April. |
 
 Validation details are in [outputs/week4_validation_results.xlsx](outputs/week4_validation_results.xlsx), and prompt iteration notes are in [PROMPT_LOG.md](PROMPT_LOG.md).
+
+## Known Limitations
+
+The Week 4 validation set showed that nature and ambiguous images still need human review. In Run 2, the model over-interpreted a forest path image and treated it like an environmental/deforestation image, even though the actual purpose was simpler.
+
+Text-heavy flyers usually improved after prompt iteration, but dense, low-contrast, or screenshot-style text can still be missed or summarized too generally. For flyers, charts, and screenshots, the user should still check that the event details, labels, numbers, and trends are actually captured.
+
+Poor lighting and unclear subjects remain risky because the model can sound confident even when the image is ambiguous. The app now prompts the model to say what is uncertain, but it cannot guarantee that every uncertain image will be handled cautiously.
+
+## What I'd Build Next
+
+1. I would add batch upload with a CSV export so a nonprofit could process a whole folder of website or social media images at once. This would make the tool useful for real cleanup work instead of one image at a time.
+2. I would add a review checklist that flags risky outputs, like missing dates on flyers or confident language on dark photos. This would help users know when to trust the result and when to rewrite it.
+3. I would add a browser or CMS workflow for pasting alt text directly into posts. This would reduce copy/paste friction for the people maintaining nonprofit websites and social accounts.
+
+## What I Learned
+
+In Week 1, I thought building with an LLM API would mostly mean connecting the API and writing one good prompt. After testing, I do not think that anymore. The harder part is measuring the outputs, finding patterns in the failures, and making sure a prompt change does not quietly break something that used to work. I also learned that an accessibility tool has to be accessible itself, so keyboard flow, clear errors, and copy buttons matter just as much as the model response.
 
 ## Local Development
 

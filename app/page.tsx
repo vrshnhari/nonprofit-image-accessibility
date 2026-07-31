@@ -130,7 +130,6 @@ export default function Home() {
         throw new Error(data.error ?? "The image could not be analyzed. Please try again.");
       }
 
-      console.log("Image description response:", data);
       setResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "The image could not be analyzed. Please try again.");
