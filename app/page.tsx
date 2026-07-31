@@ -155,7 +155,6 @@ export default function Home() {
       <div className="page">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Flintolabs AI Residency</p>
             <h1>Accessible Alt Text Generator</h1>
             <p className="subtitle">
               Turn nonprofit and campus images into copy-ready alt text, long
