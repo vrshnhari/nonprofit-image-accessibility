@@ -4,7 +4,7 @@ Accessible Alt Text Generator helps small nonprofits, campus clubs, and voluntee
 
 ## Demo
 
-Demo video: add the Google Drive link here after the final recording.
+[Demo video](outputs/demo/nonprofit-accessibility-generator-demo.mp4)
 
 Validation details are in [outputs/week4_validation_results.xlsx](outputs/week4_validation_results.xlsx), and prompt iteration notes are in [PROMPT_LOG.md](PROMPT_LOG.md).
 
