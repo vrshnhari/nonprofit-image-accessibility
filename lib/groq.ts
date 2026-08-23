@@ -30,7 +30,7 @@ export class GroqNetworkError extends Error {
   }
 }
 
-const ACCESSIBILITY_PROMPT = `You are an accessibility assistant. Analyze the uploaded image and return only valid JSON with three keys: 'alt_text', 'long_description', and 'text_in_image'. Keep alt_text under 125 characters and make it convey the image's purpose, not just generic objects. For flyers, signs, and screenshots, include the most important visible text such as event title, date, time, location, labels, or chart trend. For unclear, dark, or ambiguous photos, say what is uncertain instead of inventing details. Return 'None detected' for text_in_image only when no readable text is visible.`;
+const ACCESSIBILITY_PROMPT = `You are an accessibility assistant. Analyze the uploaded image and return only valid JSON with three keys: 'alt_text', 'long_description', and 'text_in_image'. Keep alt_text under 125 characters by summarizing the image's purpose in a complete phrase, not by cutting off a sentence. For flyers, signs, and screenshots, include the most important visible text such as event title, date, time, location, labels, or chart trend. For unclear, dark, or ambiguous photos, say what is uncertain instead of inventing details. Return 'None detected' for text_in_image only when no readable text is visible.`;
 
 const DEFAULT_GROQ_VISION_MODEL = "qwen/qwen3.6-27b";
 

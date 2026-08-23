@@ -18,15 +18,75 @@ const SUPPORTED_MIME_TYPES: SupportedMimeType[] = [
 ];
 
 const MAX_BASE64_IMAGE_LENGTH = Math.ceil((4 * 1024 * 1024 * 4) / 3);
+const MAX_ALT_TEXT_LENGTH = 125;
+
+function shortenAltText(text: string) {
+  const cleanedText = text.replace(/\s+/g, " ").trim();
+
+  if (cleanedText.length <= MAX_ALT_TEXT_LENGTH) {
+    return cleanedText;
+  }
+
+  const withoutIntro = cleanedText
+    .replace(
+      /^(this|the)\s+(image|photo|picture|graphic|screenshot)\s+(shows|depicts|features|contains|is of)\s+/i,
+      "",
+    )
+    .replace(/^(an?|the)\s+(image|photo|picture|graphic|screenshot)\s+of\s+/i, "");
+
+  if (withoutIntro.length <= MAX_ALT_TEXT_LENGTH) {
+    return withoutIntro;
+  }
+
+  const firstSentence = withoutIntro.match(/^[^.!?]+[.!?]/)?.[0].trim();
+
+  if (firstSentence && firstSentence.length <= MAX_ALT_TEXT_LENGTH) {
+    return firstSentence;
+  }
+
+  const clauses = withoutIntro
+    .split(/[,;:]/)
+    .map((clause) => clause.trim())
+    .filter(Boolean);
+
+  let summary = "";
+
+  for (const clause of clauses) {
+    const nextSummary = summary ? `${summary}, ${clause}` : clause;
+
+    if (nextSummary.length > MAX_ALT_TEXT_LENGTH) {
+      break;
+    }
+
+    summary = nextSummary;
+  }
+
+  if (summary.length >= 30) {
+    return summary.replace(/[.,;:!?-]+$/g, "");
+  }
+
+  const words = withoutIntro.split(" ");
+  let wordSummary = "";
+
+  for (const word of words) {
+    const nextSummary = wordSummary ? `${wordSummary} ${word}` : word;
+
+    if (nextSummary.length > MAX_ALT_TEXT_LENGTH) {
+      break;
+    }
+
+    wordSummary = nextSummary;
+  }
+
+  return wordSummary.replace(/[.,;:!?-]+$/g, "");
+}
 
 function normalizeResult(raw: VisionResult) {
   if (typeof raw.alt_text !== "string" || !raw.alt_text.trim()) {
     throw new Error("Groq did not return short alt text.");
   }
 
-  const altText = raw.alt_text.trim();
-  const normalizedAltText =
-    altText.length > 125 ? `${altText.slice(0, 122).trimEnd()}...` : altText;
+  const normalizedAltText = shortenAltText(raw.alt_text);
 
   return {
     alt_text: normalizedAltText,

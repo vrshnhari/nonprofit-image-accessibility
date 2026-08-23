@@ -28,7 +28,7 @@ The app does not store images, generated text, accounts, or history. Each upload
 
 For example, a flyer is not just "a blue poster." Its purpose is usually the event title, date, time, location, and call to action. A chart is not just "a bar chart." Its purpose is the trend or comparison the viewer is supposed to understand.
 
-This app enforces a 125-character limit for the short alt text because that is a common screen reader and publishing convention, not a WCAG requirement. WCAG 1.1.1 itself does not set a character limit.
+This app enforces a 125-character limit for the short alt text because that is a common screen reader and publishing convention, not a WCAG requirement. If a model response is too long, the app shortens it into a concise complete phrase instead of cutting it off mid-sentence. WCAG 1.1.1 itself does not set a character limit.
 
 ## Before-and-After Examples
 
@@ -113,6 +113,6 @@ USE_MOCK=false
 
 `GROQ_VISION_MODEL` controls the Groq vision model. This project uses `qwen/qwen3.6-27b`, verified on Groq's supported model list on July 23, 2026. If image generation stops working with a model error, check [Groq's supported models page](https://console.groq.com/docs/models) and update this variable to a current model with image/OCR capability.
 
-`USE_MOCK=true` runs the app with fixture data and does not call Groq. This is useful for testing the UI, copy buttons, loading states, and 125-character truncation without using API quota or needing a key.
+`USE_MOCK=true` runs the app with fixture data and does not call Groq. This is useful for testing the UI, copy buttons, loading states, and 125-character shortening without using API quota or needing a key.
 
 For deployment, add the environment variables in the Vercel dashboard under **Settings → Environment Variables**, then redeploy. `.env.local` is listed in `.gitignore`, so local secrets stay off GitHub.
