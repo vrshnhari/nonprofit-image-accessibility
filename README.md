@@ -105,13 +105,13 @@ Set these variables locally in `.env.local` and in Vercel project settings. Do n
 ```bash
 VISION_PROVIDER=groq
 GROQ_API_KEY=your_key_here
-GROQ_VISION_MODEL=qwen/qwen3.6-27b
+GROQ_VISION_MODEL=qwen/qwen3.8-27b
 USE_MOCK=false
 ```
 
 `GROQ_API_KEY` is the private server-side key used by the API route. It is only read in server code and should never be prefixed with `NEXT_PUBLIC_`.
 
-`GROQ_VISION_MODEL` controls the Groq vision model. This project uses `qwen/qwen3.6-27b`, verified on Groq's supported model list on July 23, 2026. If image generation stops working with a model error, check [Groq's supported models page](https://console.groq.com/docs/models) and update this variable to a current model with image/OCR capability.
+`GROQ_VISION_MODEL` controls the Groq vision model. This project uses `qwen/qwen3.8-27b`, verified on Groq's supported model list on September 30, 2026. If image generation stops working with a model error, check [Groq's supported models page](https://console.groq.com/docs/models) and update this variable to a current model with image/OCR capability.
 
 `USE_MOCK=true` runs the app with fixture data and does not call Groq. This is useful for testing the UI, copy buttons, loading states, and 125-character shortening without using API quota or needing a key.
 

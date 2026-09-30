@@ -32,7 +32,8 @@ export class GroqNetworkError extends Error {
 
 const ACCESSIBILITY_PROMPT = `You are an accessibility assistant. Analyze the uploaded image and return only valid JSON with three keys: 'alt_text', 'long_description', and 'text_in_image'. Keep alt_text under 125 characters by summarizing the image's purpose in a complete phrase, not by cutting off a sentence. For flyers, signs, and screenshots, include the most important visible text such as event title, date, time, location, labels, or chart trend. For unclear, dark, or ambiguous photos, say what is uncertain instead of inventing details. Return 'None detected' for text_in_image only when no readable text is visible.`;
 
-const DEFAULT_GROQ_VISION_MODEL = "qwen/qwen3.6-27b";
+const DEFAULT_GROQ_VISION_MODEL = "qwen/qwen3.8-27b";
+const DEPRECATED_GROQ_VISION_MODELS = new Set(["qwen/qwen3.6-27b"]);
 
 const MOCK_RESULT: Required<VisionResult> = {
   alt_text:
@@ -56,7 +57,11 @@ export async function describeImage(
     throw new Error("Missing GROQ_API_KEY in .env.local or Vercel environment variables.");
   }
 
-  const model = process.env.GROQ_VISION_MODEL ?? DEFAULT_GROQ_VISION_MODEL;
+  const configuredModel = process.env.GROQ_VISION_MODEL?.trim();
+  const model =
+    configuredModel && !DEPRECATED_GROQ_VISION_MODELS.has(configuredModel)
+      ? configuredModel
+      : DEFAULT_GROQ_VISION_MODEL;
   let response: Response;
 
   try {
